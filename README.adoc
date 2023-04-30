@@ -1,0 +1,247 @@
+= BASIC2DOSBox Linux
+:experimental:
+ifdef::env-github[]
+:toc:
+:toc-placement: preamble
+endif::[]
+ifndef::env-github[]
+:toc:
+:toc-placement: left
+endif::[]
+:imagesdir: images
+:author: life888888
+:project-name: BASIC2DOSBoxLinux
+:project-version: 0.1.0
+:project-repo-url: https://github.com/{author}/{project-name}
+:download-root: {project-repo-url}/releases/download/v{project-version}
+life888888
+
+
+
+== Overview
+This handy tool copies the selected versions of BASIC (QBasic 1.1, QuickBASIC 4.5, QuickBASIC Extended 7.1) with just run simple command on linux, then creates configuration files and shortcuts.
+
+Original Version is from https://www.qbasic.net/en/qbasic-downloads/DOS/Windows-Solutions.htm
+
+But this BASIC2DOSBox needs to be executed on Windows XP/7/10 platform, I want to achieve similar effect on Linux, so I wrote a simple shell script to achieve the same function.
+
+
+== Install and Config
+
+=== Download
+Download {download-root}/{project-name}.zip[this project]
+
+Unzip {project-name}.zip
+
+=== Install
+
+Just execute the following two shell script files to complete the installation.
+
+[source,bash]
+----
+# INSTALL WGET AND DOSBOX
+./pre-install.sh
+
+# INSTALL BASIC TO DOSBOX
+./basic2dos.sh
+----
+
+=== Create Link
+
+[source,bash]
+----
+mkdir -p ~/bin
+cd ~/bin
+ln -s ~/dosbox/BASIC2DOSBoxLinux/_shortcut/run-qbasic.sh qbasic
+ln -s ~/dosbox/BASIC2DOSBoxLinux/_shortcut/run-qb45.sh qb45
+ln -s ~/dosbox/BASIC2DOSBoxLinux/_shortcut/run-qbx.sh qbx
+----
+
+=== Add to PATH
+
+.ADD THIS LINE TO `.bashrc`
+[source,bash]
+----
+export PATH=~/bin:$PATH
+----
+
+== Now you can execute QBASIC on Linux.
+
+* open terminal, run command `qbasic` , if everything is OK, then you can see QBASIC is appear.
+
+* open terminal, run command `qb45` , if everything is OK, then you can see Quick BASIC 4.5 is appear.
+
+* open terminal, run command `qbx` , if everything is OK, then you can see Quick BASIC Extended 7.1 is appear.
+
+[NOTE]
+====
+In DOSBOX you can find those drives:
+
+* `C:` is your QBASIC or Quick BASIC 4.5 or Quick BASIC Extended 7.1 drive.
+* `A:` is Floppy drive.
+* `D:` is QBasic Example Code drive.
+* `E:` is HDD Drive. You can save your code `E:` in QBASIC, Quick BASIC 4.5,Quick BASIC Extended 7.1.
+
+====
+
+
+
+== Why build this 
+Because I want to use `Antlr4` + `Java` to write a QBasic syntax-compatible interpreter and compiler. At the same time I need a platform to compare and verify the QBASIC standard. So use DOSBOX and QBASIC to execute.
+
+== Technical Description
+
+=== Directory Structure
+After the installation is complete, it will be under this path: "~/dosbox/BASIC2DOSBoxLinux"
+
+There will be the following directories under it
+
+[%header,cols="1,5"]
+|===
+|DirName
+|Description
+
+|_config
+|Place conf file for QBASIC/Quick Basic 4.5/Quick Basic 7.1 DOSBOX
+
+|_floppy  
+|Empty directory, used for `A:` floppy drive corresponding to DOSBOX
+
+|_hdd  
+|Empty directory, used for DOSBOX corresponding `E:` HDD drive
+
+|qb11  
+|Program directory for QBASIC
+
+|qb45  
+|Program Directory for Quick Basic 4.5
+
+|qbx  
+|Program directory for Quick Basic 7.1
+
+
+|_shortcut  
+|directory for shell scripts that start QBASIC/Quick Basic 4.5/Quick Basic 7.1 DOSBOX
+
+|_source
+|The directory used to put QBASIC Example Code
+
+|===
+
+
+=== DOSBOX Config
+
+qbasic.conf (qb45.conf, qbx.conf) is modify from default DOSBOX config file (`~/.dosbox/dosbox-0.74-3.conf`)
+
+I modified the default DOSBOX config:
+
+==== sdl section
+
+* window resolution size to `1024x768`, 
+* full screen resolution size to `desktop`.
+* fulldouble to `true`
+* output to `overlay`
+
+[source,bash]
+----
+[sdl]
+# MY 2023-04-27 - IF YOU WANT TO USE FULL SCREEN
+# fullscreen=true
+fullscreen=false
+#fulldouble=false
+fulldouble=true
+# fullresolution=original
+fullresolution=desktop
+# windowresolution=original
+# output=surface
+# MY 2023-04-27
+windowresolution=1024x768
+output=overlay
+....
+----
+
+==== autoexec section
+
+.qbasic.conf
+[source,bash]
+----
+[autoexec]
+# Lines in this section will be run at startup.
+# You can put your MOUNT lines here.
+
+MOUNT A "~/dosbox/BASIC2DOSBoxLinux/_floppy" -t floppy
+MOUNT C "~/dosbox/BASIC2DOSBoxLinux/qb11"
+MOUNT D "~/dosbox/BASIC2DOSBoxLinux/_source"
+MOUNT E "~/dosbox/BASIC2DOSBoxLinux/_hdd"
+C:
+QBASIC
+EXIT
+----
+
+.qb45.conf
+[source,bash]
+----
+[autoexec]
+# Lines in this section will be run at startup.
+# You can put your MOUNT lines here.
+
+MOUNT A "~/dosbox/BASIC2DOSBoxLinux/_floppy" -t floppy
+MOUNT C "~/dosbox/BASIC2DOSBoxLinux/qb45"
+MOUNT D "~/dosbox/BASIC2DOSBoxLinux/_source"
+MOUNT E "~/dosbox/BASIC2DOSBoxLinux/_hdd"
+C:
+QB
+EXIT
+----
+
+
+.qbx.conf
+[source,bash]
+----
+[autoexec]
+# Lines in this section will be run at startup.
+# You can put your MOUNT lines here.
+
+MOUNT A "~/dosbox/BASIC2DOSBoxLinux/_floppy" -t floppy
+MOUNT C "~/dosbox/BASIC2DOSBoxLinux/qbx"
+MOUNT D "~/dosbox/BASIC2DOSBoxLinux/_source"
+MOUNT E "~/dosbox/BASIC2DOSBoxLinux/_hdd"
+C:
+CD BIN
+QBX
+EXIT
+----
+
+
+I only modified the above settings, other settings are the same as the default configuration file (`~/.dosbox/dosbox-0.74-3.conf`).
+
+
+=== Install Shell Script - basic2dos.sh
+
+If you only want to install QBASIC and not Quick Basic 4.5 or Quick Basic 7.1 please modify the value from `1` to `0`, 1 means install , 0 means do not install:
+
+.basic2dos.sh
+[source,bash]
+----
+# OPTIONS
+export INSTALL_QBASIC=1
+export INSTALL_QUICKBASIC45=0
+export INSTALL_QUICKBASIC71=0
+----
+
+This setting will only install QBASIC.
+
+
+== ISSUSE
+I have not studied how this message will affect the execution of QBASIC, but QBASIC can executed, so I will not deal with it for the time being.
+
+[source,bash]
+----
+MIXER:Got different values from SDL: freq 44100, blocksize 512
+ALSA:Can't subscribe to MIDI port (65:0) nor (17:0)
+MIDI:Opened device:none
+----
+
+== License
+Free use of this project's shell scripts and config files is granted under the terms of the MIT License.
+
