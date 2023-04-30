@@ -10,10 +10,10 @@ ifndef::env-github[]
 endif::[]
 :imagesdir: images
 :author: life888888
-:project-name: BASIC2DOSBoxLinux
+:project-name: BASIC2DOSBox_Linux
 :project-version: 0.1.0
 :project-repo-url: https://github.com/{author}/{project-name}
-:download-root: {project-repo-url}/releases/download/v{project-version}
+:download-root: {project-repo-url}/archive/refs/tags/v{project-version}.tar.gz
 life888888
 
 
@@ -29,11 +29,12 @@ But this BASIC2DOSBox needs to be executed on Windows XP/7/10 platform, I want t
 == Install and Config
 
 === Download
-Download {download-root}/{project-name}.zip[this project]
+Download {download-root}[{project-name}] source code tar.gz
 
-Unzip {project-name}.zip
+Unzip {project-name}-{project-version}.tar.gz
 
 === Install
+Chage to directory {project-name}-{project-version}
 
 Just execute the following two shell script files to complete the installation.
 
